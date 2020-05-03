@@ -29,10 +29,12 @@ int ms;
 int outletTime=0;
 bool stateFull=0;
 
+int countBottle=0; 
+
 int delayMs(){
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
+  if (currentMillis - previousMillis >= 1000) {
     previousMillis = currentMillis;
     return ms++;
   }
@@ -72,8 +74,8 @@ void setRelay(){
 }
 
 void setLimit(){
- pinMode(pinlimit1,INPUT);
- pinMode(pinlimit2,INPUT);
+ pinMode(pinlimit1,INPUT_PULLUP);
+ pinMode(pinlimit2,INPUT_PULLUP);
  pinMode(pinlimit3,INPUT);
  pinMode(pinlimit4,INPUT);
  pinMode(pinlimit5,INPUT);
@@ -236,13 +238,6 @@ void loop() {
     lcd.print("1");
     digitalWrite(led2, LOW);
     digitalWrite(relay1, HIGH);
-//    digitalWrite(dirPin,LOW); //Changes the rotations direction
-//  // Makes 400 pulses for making two full cycle rotation
-//    for(int x = 0; x < 2600; x++) {
-//      digitalWrite(stepPin,HIGH);
-//      delayMicroseconds(30);
-//      digitalWrite(stepPin,LOW);
-//      delayMicroseconds(30);
   }
   else if(!switch2){
     lcd.setCursor(10,1);
@@ -280,12 +275,14 @@ void loop() {
     lcd.setCursor(13,1);
     lcd.print("1");
     digitalWrite(led5, LOW);
+    digitalWrite(led6, LOW);
     digitalWrite(relay3, HIGH);
   }
   else if(!switch5){
     lcd.setCursor(13,1);
     lcd.print("0");
-    digitalWrite(led4, HIGH);
+    digitalWrite(led5, HIGH);
+    digitalWrite(led6, HIGH);
     digitalWrite(relay3, LOW);
   }
   
@@ -294,6 +291,7 @@ void loop() {
   if(limit1){
     lcd.setCursor(9,2);
     lcd.print("1");
+    //stateFull=1;
   }
   else if(!limit1){
     lcd.setCursor(9,2);
@@ -357,9 +355,17 @@ void loop() {
   if(limit7){
     lcd.setCursor(15,2);
     lcd.print("1");
+    if(delayMs()>=1){
+      countBottle++;     
+    }
+    lcd.setCursor(16,3);
+    lcd.print(countBottle);
   }
   else if(!limit7){
     lcd.setCursor(15,2);
     lcd.print("0");
+
   }
+
+  
 }
