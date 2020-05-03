@@ -26,15 +26,15 @@ unsigned long previousMillis = 0;
 const long interval = 1000;
 
 int ms;
-int outletTime=0;
+int inletTime=0, outletTime=0;
 bool stateFull=0;
 
 int countBottle=0; 
+bool stateCount=0, laststateCount=0;
 
 int delayMs(){
   unsigned long currentMillis = millis();
-
-  if (currentMillis - previousMillis >= 1000) {
+  if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
     return ms++;
   }
@@ -141,9 +141,7 @@ void loop() {
   readLimit();
   digitalWrite(enPin,LOW);
   float h = dht.readHumidity();
-  // Read temperature as Celsius
   float t = dht.readTemperature();
-  // Read temperature as Fahrenheit
   float f = dht.readTemperature(true);
   
   lcd.setCursor(0,0);
@@ -156,68 +154,28 @@ void loop() {
   
   lcd.setCursor(0,3);
   lcd.print("Button: ");
-  if(button1){
-    lcd.setCursor(9,3);
-    lcd.print("1");
-  }
-  else if(!button1){
-    lcd.setCursor(9,3);
-    lcd.print("0");
-  }
-    
-  if(button2){
-    lcd.setCursor(10,3);
-    lcd.print("1");
-  }
-  else if(!button2){
-    lcd.setCursor(10,3);
-    lcd.print("0");
-  }
-    
-  if(button3){
-    lcd.setCursor(11,3);
-    lcd.print("1");
-  }
-  else if(!button3){
-    lcd.setCursor(11,3);
-    lcd.print("0");
-  }
-    
-  if(button4){
-    lcd.setCursor(12,3);
-    lcd.print("1");
-  }
-  else if(!button4){
-    lcd.setCursor(12,3);
-    lcd.print("0");
-  }
-    
-  if(button5){
-    lcd.setCursor(13,3);
-    lcd.print("1");
-  }
-  else if(!button5){
-    lcd.setCursor(13,3);
-    lcd.print("0");
-  }
-    
-  if(button6){
-    lcd.setCursor(14,3);
-    lcd.print("1");
-  }
-  else if(!button6){
-    lcd.setCursor(14,3);
-    lcd.print("0");
-  }
 
+  lcd.print(button1);
+  lcd.print(button2);
+  lcd.print(button3);
+  lcd.print(button4);
+  lcd.print(button5);
+  lcd.print(button6);
+  
   lcd.setCursor(0,1);
   lcd.print("Switch: ");
+  
+  lcd.print(switch1);
+  lcd.print(switch2);
+  lcd.print(switch3);
+  lcd.print(switch4);
+  lcd.print(switch5);
+  
   if(switch1 && stateFull==0){
-    lcd.setCursor(9,1);
-    lcd.print("1");
+    lcd.setCursor(15,1);
+    lcd.print("    ");
     digitalWrite(led1, LOW);
-    digitalWrite(dirPin,HIGH); // Enables the motor to move in a particular direction
-  // Makes 200 pulses for making one full cycle rotation
+    digitalWrite(dirPin,HIGH);
     for(int x = 0; x < 6000; x++) {
       digitalWrite(stepPin,HIGH); 
       delayMicroseconds(30); 
@@ -227,60 +185,42 @@ void loop() {
     //digitalWrite(buzzer1,HIGH);
   }
   else if(!switch1){
-    lcd.setCursor(9,1);
-    lcd.print("0");    
     digitalWrite(led1, HIGH);
     //digitalWrite(buzzer1,LOW);
     stateFull=0; 
   }  
   if(switch2){
-    lcd.setCursor(10,1);
-    lcd.print("1");
     digitalWrite(led2, LOW);
     digitalWrite(relay1, HIGH);
   }
   else if(!switch2){
-    lcd.setCursor(10,1);
-    lcd.print("0");
     digitalWrite(led2, HIGH);    
     digitalWrite(relay1, LOW);
   }
   if(switch3){
-    lcd.setCursor(11,1);
-    lcd.print("1");
     digitalWrite(led3, LOW);
     digitalWrite(relay2, HIGH);
   }
   else if(!switch3){
-    lcd.setCursor(11,1);
-    lcd.print("0");
     digitalWrite(led3, HIGH);    
     digitalWrite(relay2, LOW);
   }
   if(switch4){
-    lcd.setCursor(12,1);
-    lcd.print("1");
     digitalWrite(led4, LOW);
     digitalWrite(relay4, HIGH);
     digitalWrite(buzzer2,HIGH);
   }
   else if(!switch4){
-    lcd.setCursor(12,1);
-    lcd.print("0");
     digitalWrite(led4, HIGH);    
     digitalWrite(relay4, LOW);
     digitalWrite(buzzer2,LOW);
   }
   if(switch5){    
-    lcd.setCursor(13,1);
-    lcd.print("1");
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
     digitalWrite(relay3, HIGH);
   }
   else if(!switch5){
-    lcd.setCursor(13,1);
-    lcd.print("0");
     digitalWrite(led5, HIGH);
     digitalWrite(led6, HIGH);
     digitalWrite(relay3, LOW);
@@ -288,84 +228,55 @@ void loop() {
   
   lcd.setCursor(0,2);
   lcd.print("Limit : ");
+
+  lcd.print(limit1);
+  lcd.print(limit2);
+  lcd.print(limit3);
+  lcd.print(limit4);
+  lcd.print(limit5);
+  lcd.print(limit6);
+  lcd.print(limit7);
+  
   if(limit1){
-    lcd.setCursor(9,2);
-    lcd.print("1");
-    //stateFull=1;
+    lcd.setCursor(17,1);
+    lcd.print(inletTime);
+    inletTime=delayMs();
+    if (inletTime >= 5){
+      stateFull=1;
+      lcd.setCursor(15,1);
+      lcd.print("END");
+    }
   }
-  else if(!limit1){
-    lcd.setCursor(9,2);
-    lcd.print("0");
-  }
+//  else if(!limit1){
+//    ms=0;
+//  }
     
   if(limit2){
-    lcd.setCursor(10,2);
-    lcd.print("1");
     ms=0;
   }
   else if(!limit2){
-    lcd.setCursor(10,2);
-    lcd.print("0");
     lcd.setCursor(17,2);
     lcd.print(outletTime);
     outletTime=delayMs();
     if (outletTime >= 2){
       stateFull=1;
-      lcd.setCursor(10,2);
-      lcd.print("X");
+      lcd.setCursor(15,1);
+      lcd.print("END");
     }
-  }
-    
-  if(limit3){
-    lcd.setCursor(11,2);
-    lcd.print("1");
-  }
-  else if(!limit3){
-    lcd.setCursor(11,2);
-    lcd.print("0");
-  }
-    
-  if(limit4){
-    lcd.setCursor(12,2);
-    lcd.print("1");
-  }
-  else if(!limit4){
-    lcd.setCursor(12,2);
-    lcd.print("0");
-  }
-    
-  if(limit5){
-    lcd.setCursor(13,2);
-    lcd.print("1");
-  }
-  else if(!limit5){
-    lcd.setCursor(13,2);
-    lcd.print("0");
-  }
-    
-  if(limit6){
-    lcd.setCursor(14,2);
-    lcd.print("1");
-  }
-  else if(!limit6){
-    lcd.setCursor(14,2);
-    lcd.print("0");
   }
   
   if(limit7){
-    lcd.setCursor(15,2);
-    lcd.print("1");
-    if(delayMs()>=1){
-      countBottle++;     
-    }
-    lcd.setCursor(16,3);
-    lcd.print(countBottle);
+    stateCount=1;
+    if(stateCount!=laststateCount){
+      countBottle++; 
+    }     
+    laststateCount=stateCount; 
   }
   else if(!limit7){
-    lcd.setCursor(15,2);
-    lcd.print("0");
-
+    stateCount=0;
+    laststateCount=0;
   }
 
-  
+    lcd.setCursor(16,3);
+    lcd.print(countBottle);  
 }
