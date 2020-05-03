@@ -32,11 +32,13 @@ bool stateFull=0;
 int countBottle=0; 
 bool stateCount=0, laststateCount=0;
 
-int delayMs(){
+void delayMs(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
+    inletTime++;
+    outletTime++;
     previousMillis = currentMillis;
-    return ms++;
+//    return ms++;
   }
 }
 
@@ -139,6 +141,7 @@ void loop() {
   readBtn();
   readSwitch();
   readLimit();
+  delayMs();
   digitalWrite(enPin,LOW);
   float h = dht.readHumidity();
   float t = dht.readTemperature();
@@ -152,15 +155,15 @@ void loop() {
   lcd.setCursor(14,0);
   lcd.print(t,2);
   
-  lcd.setCursor(0,3);
-  lcd.print("Button: ");
-
-  lcd.print(button1);
-  lcd.print(button2);
-  lcd.print(button3);
-  lcd.print(button4);
-  lcd.print(button5);
-  lcd.print(button6);
+//  lcd.setCursor(0,3);
+//  lcd.print("Button: ");
+//
+//  lcd.print(button1);
+//  lcd.print(button2);
+//  lcd.print(button3);
+//  lcd.print(button4);
+//  lcd.print(button5);
+//  lcd.print(button6);
   
   lcd.setCursor(0,1);
   lcd.print("Switch: ");
@@ -174,7 +177,7 @@ void loop() {
   if(switch1 && stateFull==0){
     lcd.setCursor(15,1);
     lcd.print("    ");
-    digitalWrite(led1, LOW);
+    digitalWrite(led4, LOW);
     digitalWrite(dirPin,HIGH);
     for(int x = 0; x < 6000; x++) {
       digitalWrite(stepPin,HIGH); 
@@ -185,45 +188,45 @@ void loop() {
     //digitalWrite(buzzer1,HIGH);
   }
   else if(!switch1){
-    digitalWrite(led1, HIGH);
+    digitalWrite(led4, HIGH);
     //digitalWrite(buzzer1,LOW);
     stateFull=0; 
   }  
   if(switch2){
-    digitalWrite(led2, LOW);
-    digitalWrite(relay1, HIGH);
-  }
-  else if(!switch2){
-    digitalWrite(led2, HIGH);    
-    digitalWrite(relay1, LOW);
-  }
-  if(switch3){
-    digitalWrite(led3, LOW);
+    digitalWrite(led6, LOW);
     digitalWrite(relay2, HIGH);
   }
-  else if(!switch3){
-    digitalWrite(led3, HIGH);    
+  else if(!switch2){
+    digitalWrite(led6, HIGH);    
     digitalWrite(relay2, LOW);
   }
+  if(switch3){
+    digitalWrite(led5, LOW);
+    digitalWrite(relay3, HIGH);
+  }
+  else if(!switch3){
+    digitalWrite(led5, HIGH);    
+    digitalWrite(relay3, LOW);
+  }
   if(switch4){
-    digitalWrite(led4, LOW);
+    digitalWrite(led1, LOW);
     digitalWrite(relay4, HIGH);
     digitalWrite(buzzer2,HIGH);
   }
   else if(!switch4){
-    digitalWrite(led4, HIGH);    
+    digitalWrite(led1, HIGH);    
     digitalWrite(relay4, LOW);
     digitalWrite(buzzer2,LOW);
   }
   if(switch5){    
-    digitalWrite(led5, LOW);
-    digitalWrite(led6, LOW);
-    digitalWrite(relay3, HIGH);
+    digitalWrite(led3, LOW);
+    digitalWrite(led2, LOW);
+    digitalWrite(relay1, HIGH);
   }
   else if(!switch5){
-    digitalWrite(led5, HIGH);
-    digitalWrite(led6, HIGH);
-    digitalWrite(relay3, LOW);
+    digitalWrite(led3, HIGH);
+    digitalWrite(led2, HIGH);
+    digitalWrite(relay1, LOW);
   }
   
   lcd.setCursor(0,2);
@@ -237,27 +240,30 @@ void loop() {
   lcd.print(limit6);
   lcd.print(limit7);
   
-  if(limit1){
-    lcd.setCursor(17,1);
-    lcd.print(inletTime);
-    inletTime=delayMs();
-    if (inletTime >= 5){
+  if(!limit1){
+    inletTime=0;
+  }
+  else if(limit1){
+//    lcd.setCursor(17,1);
+//    lcd.print(inletTime);
+//    stateFull=1;
+//    lcd.setCursor(15,1);
+//    lcd.print("END");
+//    inletTime=delayMs();
+    if (inletTime >= 3){
       stateFull=1;
       lcd.setCursor(15,1);
-      lcd.print("END");
+      lcd.print("END2");
     }
   }
-//  else if(!limit1){
-//    ms=0;
-//  }
     
   if(limit2){
-    ms=0;
+    outletTime=0;
   }
   else if(!limit2){
     lcd.setCursor(17,2);
     lcd.print(outletTime);
-    outletTime=delayMs();
+//    outletTime=delayMs();
     if (outletTime >= 2){
       stateFull=1;
       lcd.setCursor(15,1);
@@ -277,6 +283,7 @@ void loop() {
     laststateCount=0;
   }
 
-    lcd.setCursor(16,3);
-    lcd.print(countBottle);  
+  lcd.setCursor(0,3);
+  lcd.print("Counting : ");
+  lcd.print(countBottle);  
 }
